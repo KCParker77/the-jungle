@@ -1,0 +1,53 @@
+#include "assign7.h"
+
+#include <stdio.h>
+#include <ctype.h>
+#define MAX_BUFFER_SIZE 100
+#define CourseFile "course.dat"
+
+int main() {
+
+    char usrChoiceLower, usrChoice = '0';
+    char buffer[MAX_BUFFER_SIZE];
+    int iScanfCount;
+    FILE *pszCourseFile;
+
+    printf("Enter one of the following actions or press CTRL-D to exit\n");
+    printf("C - create a new course record\n");
+    printf("R - read an existing course record\n");
+    printf("U - update an existing course record\n");
+    printf("D - delete an existing course record\n");
+
+
+
+    while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL)
+    {
+        scanf(" %c", &usrChoice);
+        while(getchar()!= '\n');//clears buffer
+
+        switch (buffer[0])
+        {
+            case 'c':
+                printf("Create");
+                break;
+
+            case 'r':
+                printf("Read");
+                break;
+
+            case 'u':
+               printf("Update");
+               break;
+
+            case 'd':
+                printf("Delete");
+                break;
+
+            default:
+                printf("WRONG");
+
+        }
+        getchar();
+    }
+    return 0;
+}
