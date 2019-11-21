@@ -1,0 +1,86 @@
+#include "assign7.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#define MAX_BUFFER_SIZE 100
+#define CourseFile "course.dat"
+
+typedef struct
+{
+    char courseName[64];
+    char courseSched[4];
+    unsigned int courseHours;
+    unsigned int courseSize;
+} COURSE;
+
+/* Files */
+FILE *pszCourseFileRead;            //Binary file for read
+
+FILE *pszCourseFileWrite;           //Binary file for write
+
+void main() {
+
+    char usrChoice = '0';
+    char buffer[MAX_BUFFER_SIZE];
+    int courseNum;
+    int iScanfCount;
+    long coursePos;
+    int courseSeek;
+   
+    pszCourseFileRead = fopen(CourseFile, "rb");
+    pszCourseFileWrite = fopen(CourseFile, "wb");
+    
+    if(pszCourseFileRead == NULL)
+        printf("start over");
+
+    while (1)
+    {
+        if (buffer[0] == '\n')
+        {
+            exit(0);
+        }
+        
+        printf("Enter one of the following actions or press CTRL-D to exit\n");
+        printf("C - create a new course record\n");
+        printf("R - read an existing course record\n");
+        printf("U - update an existing course record\n");
+        printf("D - delete an existing course record\n");
+        
+        fgets(buffer, MAX_BUFFER_SIZE, stdin);
+        sscanf(buffer, " %c", &usrChoice );
+        while(getchar()!= '\n');//clears buffer
+
+        switch(usrChoice)
+        {
+            case 'c' :
+                printf("Enter a course number\n");
+                fgets(buffer, MAX_BUFFER_SIZE, stdin);
+                while(getchar()!= '\n');//clears buffer
+                printf("course num is %s\n", buffer);
+                courseNum = buffer;
+                coursePos = courseNum*sizeof(COURSE);
+                printf("courseN is %d and the pos is %ld", courseNum, coursePos);
+                //courseSeek = fseek()
+                
+                break;
+
+            case 'r' :
+                printf("Read");
+                break;
+
+            case 'u' :
+               printf("Update");
+               break;
+
+            case 'd' :
+                printf("Delete");
+                break;
+
+            default:
+                printf("WRONG");
+
+        }
+        getchar();
+    }
+
+}
