@@ -1,0 +1,87 @@
+/* 
+ * File:   assign8.c
+ * Author: vrf741
+ *
+ * Created on November 25, 2019, 1:35 PM
+ */
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <stdarg.h>
+#define ERROR_PROCESSING 99
+/*
+ * 
+ */
+ int errExit(const char szFmt[], ...);
+ 
+int errExit(const char szFmt[], ...)
+{
+    va_list args;
+    va_start(args, szFmt);
+
+    printf("ERROR: ");
+    vprintf(szFmt, args);
+
+    va_end(args);
+
+    printf("\n");
+    exit(ERROR_PROCESSING);
+}
+
+
+int main(int argc, char* argv[])
+{
+    long lForkPid;
+    long lWaitPid;
+    int iExitStatus = 0;
+    char szInput[20];
+    char *execArgv[100];
+    int i;
+    char *argvTest;
+
+    while(1)
+    {
+        for(i=1; i < argc; i++)
+                {
+                
+                    printf("start");
+                    if (strcmp(argv[i],'\0') == 0)
+                    {
+                        printf("Found null");
+                        execArgv[i] = NULL;
+                        break;
+                    }
+                    if (strcmp(argv[i], ",") == 0)
+                    {  
+                        printf("Found comma");
+                        execArgv[i] = NULL;
+                        break;
+                    }
+                    printf("normal");
+                    execArgv[i] = argv[i];
+                }
+        //lForkPid = fork();
+
+        switch(lForkPid)
+        {
+            case -1:
+                errExit("fork failed: %s", strerror(errno));
+                break;
+            case 0: //child process
+                printf("Child Process: PID=%ld, PPID=%ld\n"
+                , (long) getpid(), (long) getppid());
+                
+                execvp(execArgv[0], execArgv);
+                errExit("Child process failed to exec: %s", strerror(errno));
+
+            default: //parent process
+                printf("parent");
+                break;        
+        }
+    }
+    return (EXIT_SUCCESS);
+}
+
