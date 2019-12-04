@@ -1,0 +1,97 @@
+/* 
+ * File:   assign8.c
+ * Author: vrf741
+ *
+ * Created on November 25, 2019, 1:35 PM
+ */
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <stdarg.h>
+#define ERROR_PROCESSING 99
+/*
+ * 
+ */
+ int errExit(const char szFmt[], ...);
+ 
+int errExit(const char szFmt[], ...)
+{
+    va_list args;
+    va_start(args, szFmt);
+
+    printf("ERROR: ");
+    vprintf(szFmt, args);
+
+    va_end(args);
+
+    printf("\n");
+    exit(ERROR_PROCESSING);
+}
+
+
+int main(int argc, char* argv[])
+{
+    long lForkPid;
+    long lWaitPid;
+    int iExitStatus = 0;
+    char *execArgv[100];
+    int i = 1;
+
+    while(i < argc)
+    {
+        int counter = 0;
+
+        while(1)
+        {   
+            if (strcmp(argv[i], ",") != 0)
+            {
+                execArgv[counter] = argv[i];
+                i++;
+                if (argv[i] == NULL)
+                    {
+                    execArgv[counter] = argv[i-1];
+                    execArgv[counter+1] = NULL;
+                    break;
+                    }
+                counter++;
+            }
+            else
+            {
+
+                execArgv[counter] = NULL;
+                i++;
+                break;
+            }
+         }
+           printf("ExecArgv[1] is: %s, 2 is :%s, 3 is: %s\n", execArgv[0], execArgv[1], execArgv[2]); 
+            lForkPid = fork();
+
+            switch(lForkPid)
+            {   
+                case -1:
+                    errExit("fork failed: %s", strerror(errno));
+                    break;
+                case 0: //child process
+                    printf("Child Process: PID=%ld, PPID=%ld\n"
+                    , (long) getpid(), (long) getppid());
+                
+                    execvp(execArgv[0], execArgv);
+                    errExit("Child process failed to exec: %s", strerror(errno));
+
+                default: //parent process
+                    for (counter =0; counter < argc;counter++)
+                        {
+                        execArgv[counter] = NULL;
+                        }
+                    break;        
+            }
+        
+
+        }
+    while ((lWaitPid = wait(&iExitStatus)) > 0);
+    return (EXIT_SUCCESS);
+}
+
